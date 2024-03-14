@@ -29,10 +29,23 @@ jobs:
         with:
           terraform_version: 1.5.7
       
+      - name: Setup terraform backend
+        env:
+          TF_VAR_your_account: ${{ secrets.YOUR_ACCOUNT }}
+        run: |
+          cd terraform_backend
+          terraform init
+          terraform plan
+          terraform apply --auto-approve
+          cd ../
+        continue-on-error: true
+
       - name: Terraform
+        env:
+          TF_VAR_your_account: ${{ secrets.YOUR_ACCOUNT }}
         run: |
           cd terraform
-          terraform init
+          terraform init -backend-config="bucket=qa-community-${{ secrets.YOUR_ACCOUNT }}-backend-s3"
           terraform plan
           terraform apply --auto-approve
           cd ../
